@@ -40,10 +40,6 @@ public class WorldCupMatch implements Comparable<WorldCupMatch> {
         this.visitorTeamScore = 0;
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
-
     public String getHomeTeam() {
         return homeTeam;
     }
