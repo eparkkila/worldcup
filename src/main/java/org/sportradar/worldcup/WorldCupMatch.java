@@ -3,51 +3,50 @@ package org.sportradar.worldcup;
 /**
  * Represents a single World Cup match.
  *
- * Matches are ordered by:
- *  1. Total score (descending) — more exciting matches first
- *  2. Start time (ascending)   — earlier matches first when scores tie
+ * <p><strong>Ordering rule (conceptual):</strong>
+ * <ol>
+ *   <li>Total score (descending) — higher scoring matches first</li>
+ *   <li>Start time (ascending) — earlier matches first when tied</li>
+ * </ol>
+ *
+ * <p><strong>Immutability:</strong>
+ * <ul>
+ *   <li>Teams and start time are immutable</li>
+ *   <li>Scores are mutable during match lifetime</li>
+ * </ul>
  */
-public class WorldCupMatch implements Comparable<WorldCupMatch> {
+public class WorldCupMatch {
 
-    /** Timestamp when the match was created (used as start time) */
+    /** Timestamp when the match was created (acts as start time). */
     private final long startTime;
 
-    /** Home team name */
+    /** Home team name (never null/blank). */
     private final String homeTeam;
 
-    /** Visitor (away) team name */
+    /** Visitor (away) team name (never null/blank). */
     private final String visitorTeam;
 
-    /** Current score of the home team */
+    /** Current score of the home team. */
     private int homeTeamScore;
 
-    /** Current score of the visitor team */
+    /** Current score of the visitor team. */
     private int visitorTeamScore;
 
     /**
-     * Creates a new match with initial score 0–0.
+     * Creates a new match with an initial score of 0–0.
      *
-     * @param homeTeam    home team name (must not be null/blank)
-     * @param visitorTeam away team name (must not be null/blank and must differ from home team)
+     * @param homeTeam    home team name (must not be null or blank)
+     * @param visitorTeam away team name (must not be null or blank and must differ from home team)
      * @throws IllegalArgumentException if validation fails
      */
     public WorldCupMatch(String homeTeam, String visitorTeam) {
-        // Validate home team
-        if (homeTeam == null || homeTeam.isBlank()) {
-            throw new IllegalArgumentException("Home team name must not be empty");
-        }
+        validateTeamName(homeTeam, "Home");
+        validateTeamName(visitorTeam, "Visitor");
 
-        // Validate visitor team
-        if (visitorTeam == null || visitorTeam.isBlank()) {
-            throw new IllegalArgumentException("Visitor team name must not be empty");
-        }
-
-        // Teams must be different
         if (homeTeam.equals(visitorTeam)) {
             throw new IllegalArgumentException("Teams must be different");
         }
 
-        // Capture creation time as match start time
         this.startTime = System.currentTimeMillis();
         this.homeTeam = homeTeam;
         this.visitorTeam = visitorTeam;
@@ -55,98 +54,106 @@ public class WorldCupMatch implements Comparable<WorldCupMatch> {
         this.visitorTeamScore = 0;
     }
 
-    // -------------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // Validation helpers
+    // ---------------------------------------------------------------------
+
+    /**
+     * Validates that a team name is neither null nor blank.
+     *
+     * @param teamName team name to validate
+     * @param label    label used in error messages
+     * @throws IllegalArgumentException if invalid
+     */
+    private static void validateTeamName(String teamName, String label) {
+        if (teamName == null || teamName.isBlank()) {
+            throw new IllegalArgumentException(
+                    label + " team name must not be null or blank"
+            );
+        }
+    }
+
+    // ---------------------------------------------------------------------
     // Getters
-    // -------------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-    public String getHomeTeam() {
-        return homeTeam;
-    }
-
-    public String getVisitorTeam() {
-        return visitorTeam;
-    }
-
-    public int getHomeTeamScore() {
-        return homeTeamScore;
-    }
-
-    public int getVisitorTeamScore() {
-        return visitorTeamScore;
-    }
-
+    /** @return match start timestamp (epoch millis) */
     public long getStartTime() {
         return startTime;
     }
 
-    // -------------------------------------------------------------------------
-    // Score updates (package/protected visibility by design)
-    // -------------------------------------------------------------------------
+    /** @return home team name */
+    public String getHomeTeam() {
+        return homeTeam;
+    }
 
-    /**
-     * Updates home team score.
-     *
-     * @param homeTeamScore new score (must be >= 0)
-     */
-    protected void setScores(long homeTeamScore, long visitorTeamScore) {
-        if (homeTeamScore < 0 || visitorTeamScore < 0 || homeTeamScore > Integer.MAX_VALUE || visitorTeamScore > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Score must be non-negative and below max int value");
-        }
-        this.homeTeamScore = (int)homeTeamScore;
-        this.visitorTeamScore = (int)visitorTeamScore;
+    /** @return visitor team name */
+    public String getVisitorTeam() {
+        return visitorTeam;
+    }
 
+    /** @return current home team score */
+    public int getHomeTeamScore() {
+        return homeTeamScore;
+    }
+
+    /** @return current visitor team score */
+    public int getVisitorTeamScore() {
+        return visitorTeamScore;
     }
 
     /**
-     * Updates visitor team score.
+     * Returns the total number of goals scored in the match.
      *
-     * @param visitorTeamScore new score (must be >= 0)
+     * @return combined score of both teams
      */
-    protected void setVisitorTeamScore(int visitorTeamScore) {
-        if (visitorTeamScore < 0) {
-            throw new IllegalArgumentException("Score must be non-negative");
-        }
-        this.visitorTeamScore = visitorTeamScore;
+    public int getTotalScore() {
+        return homeTeamScore + visitorTeamScore;
     }
 
-    // -------------------------------------------------------------------------
-    // Sorting logic
-    // -------------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // Score update
+    // ---------------------------------------------------------------------
 
     /**
-     * Defines match ordering.
+     * Updates the match score.
      *
-     * Order rules:
-     *  1. Higher total score first
-     *  2. If equal, earlier start time first
+     * <p>Uses {@code long} parameters to safely detect overflow before casting
+     * to {@code int}.
+     *
+     * @param homeTeamScore    new home score (must be >= 0)
+     * @param visitorTeamScore new visitor score (must be >= 0)
+     * @throws IllegalArgumentException if scores are negative or exceed int range
      */
-    @Override
-    public int compareTo(WorldCupMatch other) {
-        if (other == null) {
-            return -1; // non-null comes before null
+    public void setScores(long homeTeamScore, long visitorTeamScore) {
+        if (homeTeamScore < 0 || visitorTeamScore < 0) {
+            throw new IllegalArgumentException("Scores must be non-negative");
         }
 
-        int thisTotal = this.homeTeamScore + this.visitorTeamScore;
-        int otherTotal = other.homeTeamScore + other.visitorTeamScore;
-
-        // Higher total score first (descending)
-        int scoreCompare = Integer.compare(otherTotal, thisTotal);
-        if (scoreCompare != 0) {
-            return scoreCompare;
+        if (homeTeamScore > Integer.MAX_VALUE || visitorTeamScore > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Score value is too large");
         }
 
-        // Earlier start time first (ascending)
-        return Long.compare(this.startTime, other.startTime);
+        this.homeTeamScore = (int) homeTeamScore;
+        this.visitorTeamScore = (int) visitorTeamScore;
     }
 
+    // ---------------------------------------------------------------------
+    // Object methods
+    // ---------------------------------------------------------------------
+
+    /**
+     * Returns a human-readable representation of the match.
+     */
     @Override
     public String toString() {
-        return "WorldCupMatch{" +
-                "startTime=" + startTime +
-                ", homeTeam='" + homeTeam + '\'' +
-                ", visitorTeam='" + visitorTeam + '\'' +
-                ", homeTeamScore=" + homeTeamScore +
-                ", visitorTeamScore=" + visitorTeamScore +
-                '}';
+        return String.format(
+                "%s %d - %d %s (started: %d)",
+                homeTeam,
+                homeTeamScore,
+                visitorTeamScore,
+                visitorTeam,
+                startTime
+        );
     }
 }
