@@ -20,7 +20,7 @@ class ModifyingTheScoreTest {
     void updateScoreTest() {
         WorldCupMatch match = scoreboard.startMatch("Germany", "Finland");
 
-        scoreboard.updateMatchScore("Germany", "Finland", 1, 3);
+        match.setScores(1, 3);
 
         assertEquals(1, match.getHomeTeamScore());
         assertEquals(3, match.getVisitorTeamScore());
@@ -32,11 +32,11 @@ class ModifyingTheScoreTest {
      */
     @Test
     void updateScoreWhenMatchIsNotOngoingTest() {
-        scoreboard.startMatch("Germany", "Finland");
+        WorldCupMatch match = scoreboard.startMatch("Germany", "Finland");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> scoreboard.updateMatchScore("Germany", "Finland2", 1, 3)
+                () -> match.setScores(1, 3)
         );
     }
 
@@ -45,11 +45,11 @@ class ModifyingTheScoreTest {
      */
     @Test
     void trySettingScoreToNegativeNumberForVisitorTeamTest() {
-        scoreboard.startMatch("Germany", "Finland");
+        WorldCupMatch match = scoreboard.startMatch("Germany", "Finland");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> scoreboard.updateMatchScore("Germany", "Finland", 1, -1)
+                () -> match.setScores( 1, -1)
         );
     }
 
@@ -58,11 +58,11 @@ class ModifyingTheScoreTest {
      */
     @Test
     void trySettingScoreToNegativeNumberForHomeTeamTest() {
-        scoreboard.startMatch("Germany", "Finland");
+        WorldCupMatch match = scoreboard.startMatch("Germany", "Finland");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> scoreboard.updateMatchScore("Germany", "Finland", -1, 1)
+                () -> match.setScores(-1, 1)
         );
     }
 
@@ -72,11 +72,11 @@ class ModifyingTheScoreTest {
      */
     @Test
     void trySettingScoreToHigherNumberThanPossibleForVisitorTeamTest() {
-        scoreboard.startMatch("Germany", "Finland");
+        WorldCupMatch match = scoreboard.startMatch("Germany", "Finland");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> scoreboard.updateMatchScore("Germany", "Finland", 1, Long.MAX_VALUE)
+                () -> match.setScores(1, Long.MAX_VALUE)
         );
     }
 
@@ -85,11 +85,11 @@ class ModifyingTheScoreTest {
      */
     @Test
     void trySettingScoreToHigherNumberThanPossibleForHomeTeamTest() {
-        scoreboard.startMatch("Germany", "Finland");
+        WorldCupMatch match = scoreboard.startMatch("Germany", "Finland");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> scoreboard.updateMatchScore("Germany", "Finland", Long.MAX_VALUE, 1)
+                () -> match.setScores(Long.MAX_VALUE, 1)
         );
     }
 }

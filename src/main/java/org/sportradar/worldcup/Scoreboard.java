@@ -1,12 +1,10 @@
 package org.sportradar.worldcup;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Scoreboard {
 
-    // For now using a hashmap to keep track of the matches
-    private final Map<String, WorldCupMatch> map = new HashMap<>();
+    private final TreeSet<WorldCupMatch> treeSet = new TreeSet<>();
 
     public WorldCupMatch startMatch(String homeTeam, String visitorTeam) {
         if (homeTeam == null || visitorTeam == null || homeTeam.isEmpty() || visitorTeam.isEmpty()) {
@@ -14,27 +12,31 @@ public class Scoreboard {
         }
 
         WorldCupMatch match = new WorldCupMatch(homeTeam, visitorTeam);
-        map.put(getKeyForTheMatch(match), match);
+        treeSet.add(match);
 
         return match;
     }
 
-    public void updateMatchScore(String homeTeam, String visitorTeam, long homeTeamScore, long visitorTeamScore) {
-        if (!map.containsKey(getKeyForTheTeams(homeTeam, visitorTeam))) {
-            throw new IllegalArgumentException("Could not find the the match between " + homeTeam + " and " + visitorTeam);
+    public void endMatch(WorldCupMatch match) {
+        if (match == null) {
+            throw new IllegalArgumentException();
         }
 
-        if (homeTeamScore < 0 || visitorTeamScore < 0) {
-            throw new IllegalArgumentException("Home team score or visitor team score cannot be a negative number");
+        if (!treeSet.contains(match)) {
+            throw new IllegalArgumentException("The match is not being played.");
         }
 
-        if (homeTeamScore > Integer.MAX_VALUE || visitorTeamScore > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("The score of any team cannot be bigger than " + Integer.MAX_VALUE);
+        treeSet.remove(match);
+    }
+
+    public List<String> getOngoingMatches() {
+        List<String> list = new ArrayList<>();
+        for (WorldCupMatch match: treeSet) {
+            System.out.println(match.toString());
+            list.add(match.toString());
         }
 
-        WorldCupMatch match = map.get(getKeyForTheTeams(homeTeam, visitorTeam));
-        match.setHomeTeamScore((int)homeTeamScore);
-        match.setVisitorTeamScore((int)visitorTeamScore);
+        return list;
     }
 
     private static String getKeyForTheMatch(WorldCupMatch match) {
