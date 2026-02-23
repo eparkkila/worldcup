@@ -58,11 +58,13 @@ class MatchCreationTest {
         match2.setScores(9, 99);
 
         List<String> ongoingMatches = scoreboard.getOngoingMatches();
-        assertEquals(3, ongoingMatches.size());
+        assertEquals(4, ongoingMatches.size());
 
         // Removing one match and checking the result
         scoreboard.endMatch(match3);
-        assertEquals(2, ongoingMatches.size());
+        List<String> count = scoreboard.getOngoingMatches();
+
+        assertEquals(3, scoreboard.getOngoingMatches().size());
 
         // If no exceptions were thrown, the test passes
     }

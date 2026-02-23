@@ -1,6 +1,9 @@
 package org.sportradar.worldcup;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Scoreboard maintains all World Cup matches currently known by the system.
