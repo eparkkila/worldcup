@@ -46,16 +46,6 @@ public class Scoreboard {
     }
 
     /**
-     * Checks whether the given match is currently ongoing.
-     *
-     * @param match match to check
-     * @return true if match is ongoing
-     */
-    public synchronized boolean isMatchOngoing(WorldCupMatch match) {
-        return ongoingMatches.contains(match);
-    }
-
-    /**
      * Updates the score of an ongoing match.
      *
      * NOTE:

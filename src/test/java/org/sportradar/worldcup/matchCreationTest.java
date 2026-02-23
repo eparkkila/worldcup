@@ -3,6 +3,8 @@ package org.sportradar.worldcup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -51,6 +53,16 @@ class MatchCreationTest {
 
         WorldCupMatch match2 = scoreboard.startMatch("Finland2", "Sweden2");
         match2.setScores(999, 999);
+
+        WorldCupMatch match3 = scoreboard.startMatch("Finland3", "Sweden3");
+        match2.setScores(9, 99);
+
+        List<String> ongoingMatches = scoreboard.getOngoingMatches();
+        assertEquals(3, ongoingMatches.size());
+
+        // Removing one match and checking the result
+        scoreboard.endMatch(match3);
+        assertEquals(2, ongoingMatches.size());
 
         // If no exceptions were thrown, the test passes
     }
