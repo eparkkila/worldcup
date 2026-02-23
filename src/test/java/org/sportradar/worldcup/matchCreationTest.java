@@ -62,7 +62,6 @@ class MatchCreationTest {
 
         // Removing one match and checking the result
         scoreboard.endMatch(match3);
-        List<String> count = scoreboard.getOngoingMatches();
 
         assertEquals(3, scoreboard.getOngoingMatches().size());
 
