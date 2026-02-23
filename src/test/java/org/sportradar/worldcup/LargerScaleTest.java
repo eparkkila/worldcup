@@ -15,7 +15,7 @@ import java.util.List;
  * <p>Note: This test currently prints results for manual inspection.
  * In production-quality tests, assertions should be preferred.
  */
-class LargerScaleTesting {
+class LargerScaleTest {
 
     /** System under test. */
     private Scoreboard scoreboard;
