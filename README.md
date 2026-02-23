@@ -1,14 +1,38 @@
-This is a simple implementation of the Sportradar library.
-The library uses WorldCupMatch data object for presenting matches.
-The supported operations are:
-  - Start a new match
-  - Update score
-  - Finish match
-  - Get a summary of mathches in progres
+## 🏆 Live Football World Cup Score Board
 
-The implementation started from obvious unit tests (shown in the code) and while I added test I simultanuously coded the necessary part of the library.
-Library is build using Maven:
-mvn clean install
-mvn test // to run the existing test cases
+A lightweight Java library for managing ongoing World Cup match results.
 
-I wanted to impvove the performance (Big O) of the operations but ran out of time. On the other hand this kind library if used only for World Cup will perform just fine with the current implementation.
+The library uses the `WorldCupMatch` data object to represent matches and supports the following operations:
+
+- Start a new match  
+- Update match scores  
+- Finish a match  
+- Get a summary of matches in progress  
+
+---
+
+## 🛠️ Development Approach
+
+The implementation followed TDD principles and hence was test driven. As new tests were added, the necessary parts of the library were implemented incrementally.
+
+---
+
+## 🔧 Tools & Environment
+
+- **Build tool:** Apache Maven 3.9.12  
+  - Run tests with: `mvn test`  
+- **Java version:** OpenJDK 25.0.2  
+- **IDE:** IntelliJ IDEA (primary development environment)
+
+---
+
+## ⚠️ Known Limitations
+
+- Planned performance improvements (Big-O optimizations) were not completed due to time constraints.  
+- For typical World Cup usage volumes, the current implementation should perform adequately.
+
+---
+
+## 🤖 AI Assistance
+
+AI tools were used to help organize the code and fix naming inconsistencies.
